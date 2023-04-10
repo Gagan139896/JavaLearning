@@ -1,0 +1,13 @@
+package User_Input;
+
+import java.util.Scanner;
+
+public class User_Input_Long {
+
+	public static void main(String[] args) {
+		Scanner myObj = new Scanner(System.in);
+	    System.out.println("Enter any number : ");
+	    long Number4 = myObj.nextLong();
+	    System.out.println("You have entered : " + Number4);
+	}
+}
