@@ -7,5 +7,4 @@ public class Main_Class {
 		    myPig.animalSound();
 		    myPig.sleep();
 	}
-
 }

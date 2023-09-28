@@ -2,7 +2,8 @@ package Abstraction;
 
 abstract class Animal {
 	public abstract void animalSound();
-	  public void sleep() {
+	
+    public void sleep() {
 	    System.out.println("Zzz");
 	  }
 }

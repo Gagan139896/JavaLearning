@@ -1,9 +1,9 @@
 package testpack;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Properties;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -14,99 +14,85 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import NewFramework.MasterData;
+public class EmailSending {
 
-public class EmailSending extends MasterData {
-	
-	//-------Hashmap for storing excel data---------
-     static HashMap<String, String> map = new HashMap<String, String>();
-     public static void ExcelData() throws IOException {
-    	//-----------Reading Excel-------------------
- 		FileInputStream exc_path=new FileInputStream(new File("Data_File.xlsx"));  
- 		Workbook wb=new XSSFWorkbook(exc_path);   
- 		Sheet sheet=wb.getSheet("GlobalData");
- 		try {
- 			//---------For loop to put excel data in Hashmap---------------------
- 			for(int i=0;i<=sheet.getLastRowNum();i++)
- 			{
- 				Row row = sheet.getRow(i);
- 				
- 				for(int j=0;j<sheet.getRow(0).getLastCellNum();j++)
- 				{
- 					Cell cell = row.getCell(j,Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
- 					map.put(row.getCell(0).getStringCellValue(), row.getCell(1).getStringCellValue());
- 				}
- 			}
- 		} catch (Exception e) {
- 			System.out.println("Below error is found in reading first sheet \n"+e);
- 		}
-     }
-     public static void SendEmail() throws IOException {
-    	 ExcelData();
-    	 
-    	//--------Get system properties------------ 
-         Properties prop = System.getProperties();
+    public static void main(String[] args) {
 
-         //-------Setup mail server----------------
-         prop.put("mail.smtp.host", "smtp.gmail.com");
-         prop.put("mail.smtp.port", "465");
-         prop.put("mail.smtp.ssl.enable", "true"); 
-         prop.put("mail.smtp.auth", "true");
+        // Recipient's email ID needs to be mentioned.
+        String to = "neeraj.kumar@bitsinglass.com";
+         
+        // Sender's email ID needs to be mentioned
+        String from = "gagandeep.singh@bitsinglass.com";
 
-         //------Creating session object and passing username and password--------- 
-         Session session = Session.getInstance(prop, new javax.mail.Authenticator() {
-             protected PasswordAuthentication getPasswordAuthentication() {
-                 return new PasswordAuthentication(map.get("EmailFrom"), map.get("Pass"));
-             }
-         });
-         try {
-        	 //------Creating Msg object-------------
-             MimeMessage msg = new MimeMessage(session);
-             msg.setFrom(new InternetAddress(map.get("EmailFrom")));
-             //-------Adding Recipients------------
-             msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(map.get("EmailTo")));
-             
-             //-----Checking CcStatus fron the excel sheet--------
-             if(map.get("CcStatus").equalsIgnoreCase("Yes")) {
-            	 //-----Adding Recipients in cc-----
-            	 msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(map.get("Cc")));
-             }
-             //-----Subject of mail-------
-             msg.setSubject("This is a test email");
-             Multipart multipart = new MimeMultipart();
-             MimeBodyPart attachmentPart = new MimeBodyPart();
-             MimeBodyPart textPart = new MimeBodyPart();
-             try {
-            	 //----Checkinh Attachment Status from excel sheet----
-             	if(map.get("AttachStatus").equalsIgnoreCase("Yes")) 
-             	{
-                 //------Attaching file----------
-                 File f =new File(map.get("AttachFile"));
-                 attachmentPart.attachFile(f);
-                 multipart.addBodyPart(attachmentPart);
-             	}
-             	//-----Body of the mail-------
-                 textPart.setText("Hi Team,\nHope you all are doing well!\nThis mail is only for testing purpose\n\nThanks\nAutomation Testing Team");
-                 multipart.addBodyPart(textPart);
-                 
-             } catch (Exception e) {
-                 System.out.println(e);
-             } 
-             msg.setContent(multipart);
-             System.out.println("sending...");
-             Transport.send(msg);
-             System.out.println("Sent message successfully....");
-         } catch (Exception ex) {
-            System.out.println(ex);
-         }
-     }
-     public static void main(String[] args) throws IOException{
-    	 SendEmail();
+        
+        // Assuming you are sending email from through gmails smtp
+        String host = "smtp.gmail.com";//service that gmail providing to trigger the mail
+
+        // Get system properties
+        Properties properties = System.getProperties();
+
+        // Setup mail server
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", "465");
+        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.auth", "true");
+
+        // Get the Session object.// and pass 
+        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+
+            protected PasswordAuthentication getPasswordAuthentication() {
+
+                return new PasswordAuthentication("gagandeep.singh@bitsinglass.com", "Gagan@0309");
+
+            }
+
+        });
+        //session.setDebug(true);
+        try {
+            // Create a default MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+
+            // Set From: header field of the header.
+            message.setFrom(new InternetAddress(from));
+
+            // Set To: header field of the header.
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+
+            // Set Subject: header field
+            message.setSubject("This is the Subject Line!");
+
+            Multipart multipart = new MimeMultipart();
+
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+
+            MimeBodyPart textPart = new MimeBodyPart();
+
+            try {
+
+                File f =new File("C:\\Users\\gagandeep.singh_bits\\BIG\\First_Maven\\Report.xlsx");
+
+                attachmentPart.attachFile(f);
+                textPart.setText("This is text");
+                multipart.addBodyPart(textPart);
+                multipart.addBodyPart(attachmentPart);
+
+            } catch (IOException e) {
+
+                e.printStackTrace();
+
+            }
+
+            message.setContent(multipart);
+
+            System.out.println("sending...");
+            // Send message
+            Transport.send(message);
+            System.out.println("Sent message successfully....");
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
+
     }
+
 }
